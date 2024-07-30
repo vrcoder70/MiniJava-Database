@@ -1,0 +1,36 @@
+#!/bin/bash
+
+scriptlocation=$(dirname "$0")
+
+if [ -z "$1" ] || [ "$1" = "--usage" ]; then
+	cat $scriptlocation/query_usage.txt
+	exit 0
+fi
+
+debug="NODEBUG"
+filtered_args=()
+for arg in "$@"; do
+	if [ "$arg" != "--debug" ]; then
+		filtered_args+=("$arg")
+	else
+		debug="DEBUG"
+	fi
+done
+
+if [ "$debug" = "NODEBUG" ]; then
+	java \
+		-cp $scriptlocation:$scriptlocation/.. \
+		program.Query "DELETE_QUERY" "$debug" "${filtered_args[@]}"
+else # debug
+	time java \
+		-XX:+FlightRecorder \
+		-XX:StartFlightRecording=duration=1000s,filename=delete_query.jfr \
+		-cp $scriptlocation:$scriptlocation/.. \
+		program.Query "DELETE_QUERY" "$debug" "${filtered_args[@]}"
+fi
+
+if [ $? -ne 0 ]; then
+	echo "query failed" >&2
+	cat $scriptlocation/query_usage.txt >&2
+	exit 1
+fi

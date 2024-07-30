@@ -1,0 +1,19 @@
+Usage:
+  query COLUMNDBNAME COLUMNARFILENAME '[TARGETCOLUMNNAMES]' \
+  'VALUECONSTRAINT' NUMBUF ACCESSTYPE
+
+VALUECONSTRAINT should be in the format:
+  1. {COLUMNNAME OPERATOR VALUE}
+  2. {(COLUMNNAME1 OPERATOR VALUE1) and (COLUMNNAME2 OPERATOR VALUE2)}
+  3. {(COLUMNNAME1 OPERATOR VALUE1) or  (COLUMNNAME2 OPERATOR VALUE2)}
+
+  OPERATOR can be:
+    =     | <     | >     | <=    | >=    | !=    
+    aopEQ | aopLT | aopGT | aopLE | aopGE | aopNE 
+
+ACCESSTYPE:
+  FILESCAN | COLUMNSCAN | BTREE | BITMAP | CBITMAP
+
+Example:
+  query test testFile '[A,B,C,D]' \
+  '{(A = Delaware) or (B = Colorado)}' 50 filescan
